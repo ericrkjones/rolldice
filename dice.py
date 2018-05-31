@@ -25,7 +25,7 @@ def translatedoperator(matchobj):
 		drop = 'None'
 	if Ndrop is None:
 		Ndrop = 'None'
-	return '_[' + N + ',' + d + ',' + drop + ',' + Ndrop + ']'
+	return '_[' + N + ',' + d + ',"' + drop + '","' + Ndrop + '"]'
 
 # Find dice notation expresion and execute replacement with python code
 def parseexpression(strarg):

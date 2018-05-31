@@ -23,6 +23,15 @@ class Distribution:
 				filleddistribution[x] = 0
 		return filleddistribution
 
+	def plotformat(self):
+		plotformatteddistribution = []
+		filleddistribution = self.filledDistribution()
+		plotformatteddistribution.append(sorted(list(filleddistribution.keys())))
+		plotformatteddistribution.append([filleddistribution[x] for x in plotformatteddistribution[0]])
+		return plotformatteddistribution
+
+
+
 	# Simple 1-argument Operators
 
 	def __neg__(self):
