@@ -1,21 +1,29 @@
-#!/usr/bin/python
-# Argument list is a comma-separated list of lists of dice expressions and names
-# For example: ./rolldice.py '(1d4*2)d6 karate chickens, 2d6d8'
-
+#!/usr/bin/python3
 import sys
 import re
-from dice import dicelist as dicelist
-from dice import roll as roll
+from random import randint as randint
+from dice import interpretinstructions, dropdice
 
+# Random number function as placeholder in case system random is not sufficient.
+def randomnumber(low,high):
+	return randint(low,high)
+
+# Random number generated roll.  
+def roll(N,d,drop,Ndrop):
+	output = sum(dropdice([randomnumber(1,d) for n in range(N)],drop,Ndrop))
+	return output
+
+# Parse instructions for rolling random numbers and displaying them in the output
 def parseinstructions(strargs):
 	instructions=[x.split(' ',1) for x in re.split(', *',strargs)]
-	print instructions
+	print(instructions)
 	for item in instructions:
-		rollednumber = dicelist(item[0])
+		rolled = eval(interpretinstructions(item[0]))
 		if len(item) > 1:
-			print "{} {}".format(rollednumber, item[1])
+			print(rolled, item[1])
 		else:
-			print "{}".format(rollednumber)
+			print(rolled)
 
 parseinstructions(' '.join(sys.argv[1:]))
+
 
