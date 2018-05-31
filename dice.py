@@ -1,50 +1,69 @@
-#!/usr/bin/python
 import re
-from random import randint as randint
-itermax=1000
-
-def roll(N,sides):
-	output = [randint(1,sides) for n in range(0,N)]
-	# print(output)
-	return output
-
-def evaldice(matchobj):
-	rolled = sorted(roll(int(matchobj.group(1)),int(matchobj.group(2))))
-	if matchobj.group(3) == 'l':
-		result = rolled[int(matchobj.group(4)):]
+# Function to sort the dice roll and remove dice either from the top or bottom.  
+def dropdice(rolled, drop, N):
+	# If drop or N are None, these are false.
+	rolled = sorted(rolled)
+	if drop == 'l':
+		result = rolled[int(N):]
 		# print "Dropped lowest", matchobj.group(4), "dice:", rolled, '>', result
 	else:
-		if matchobj.group(3) == 'h':
-			result = rolled[:-int(matchobj.group(4))]
+		if drop == 'h':
+			result = rolled[:-int(N)]
 			# print "Dropped highest", matchobj.group(4), "dice:", rolled, '>', result
 		else:
 			result = rolled
-
-
-	total = str(sum(result))
-	# print 'Rolling:', matchobj.groups(), '=', total
-	return total
-
-def evaluatedicelist(matchobj):
-	# print 'inside parentheses -', matchobj.group(0)
-	# print matchobj.group(1)
-	new = re.sub('([0-9]+)d([0-9]+)(?:(l|h)([0-9]+))?', evaldice, matchobj.group(1))
-	result=str(eval(new))
-	# print 'Evaluating: ', new, '=', result
 	return result
-	
-def evaluateparentheses(matchobj):
-	# print 'new level: ', matchobj.group(1)
-	return re.sub('\(([^()]*)\)', evaluatedicelist, matchobj.group(1))
-	
-def dicelist(strarg):
-	# Create a count variable to limit overrunning
-	count = 0
-	# Parse everything in parentheses.  
-	# As long as there are parentheses in the dice list, evaluate all discrete inner-most parentheses
-	while count < itermax and '(' in strarg or ')' in strarg:
-		# print 'Level', count, ':'
-		strarg = re.sub('(.*)', evaluateparentheses, strarg)
-		count += 1
-	strarg = re.sub('(.*)', evaluatedicelist, strarg)
+
+# Translate dice notation 'd' operator into python code
+def translatedoperator(matchobj):
+	N = matchobj.group(1)
+	d = matchobj.group(2)
+	drop = matchobj.group(3)
+	Ndrop = matchobj.group(4)
+	# Function dropdice handles 'None' arguments correctly, so make sure it gets them correctly.
+	if drop is None:
+		drop = 'None'
+	if Ndrop is None:
+		Ndrop = 'None'
+	return '_[' + N + ',' + d + ',' + drop + ',' + Ndrop + ']'
+
+# Find dice notation expresion and execute replacement with python code
+def parseexpression(strarg):
+	# print(strarg)
+	output = re.sub('([0-9]+|\[.*?\])d([0-9]+|\[.*?\])(?:(l|h)([0-9]+|\[.*?\]))?', translatedoperator, strarg)
+	# print(output)
+	return output
+
+# Filter instructions to make sure only acceptable characters are present.
+def filterinstructions(strarg):
+	allowedcharacters = ('1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'd', 'D', 'h', 'H', 'l', 'L', '(', ')', '+', '-', '/', '*', '%', '.')
+	if any (x not in allowedcharacters for x in strarg):
+		raise ValueError('Disallowed characters in argument string')
+	else:
+		strarg = strarg.replace(' ', '').lower()
 	return strarg
+
+# Translate instructions from dice notation to python code.
+def translateinstructions(strarg):
+	# Find the highest-level group of parentheses and evaluate it.
+	# Relpace the parentheses with square brackets.
+	# Replace any NdS(l|h)M expressions with _[N,S,(l|h),M]
+
+	# Replace parentheses
+	strarg = strarg.replace('(', '[').replace(')', ']')
+	# print(strarg) #DEBUG
+
+	# Iterate through replacing d operators
+	while 'd' in strarg:
+		strarg = parseexpression(strarg)
+	# print(strarg) #DEBUG
+
+	# Re-replace function name and parentheses
+	strarg = strarg.replace('_', 'roll').replace('[', '(').replace(']', ')')
+	# print(strarg) #DEBUG
+	return strarg
+
+# Alias for filter and then translate instructions
+def interpretinstructions(strarg):
+	return translateinstructions(filterinstructions(strarg))
+
