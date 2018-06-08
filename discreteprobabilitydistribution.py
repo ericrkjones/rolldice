@@ -19,6 +19,12 @@ class Distribution:
 			newdistribution.distribution[choice]=scale*self.distribution[choice]/total
 		return newdistribution
 
+	# Normalize in-place
+	def inormalize(self, scale=1):
+		total = sum([self.distribution[x] for x in self.distribution])
+		for choice in self.distribution:
+			self.distribution[choice]=scale*self.distribution[choice]/total
+
 	def filledDistribution(self):
 		filleddistribution = {}
 		for x in range(min(self.distribution), max(self.distribution) + 1):
