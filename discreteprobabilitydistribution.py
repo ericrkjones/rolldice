@@ -12,6 +12,13 @@ class Distribution:
 		else:
 			self.distribution[choicevalue] += count
 
+	def normalize(self, scale=1):
+		total = sum([self.distribution[x] for x in self.distribution])
+		newdistribution=Distribution()
+		for choice in self.distribution:
+			newdistribution.distribution[choice]=scale*self.distribution[choice]/total
+		return newdistribution
+
 	def filledDistribution(self):
 		filleddistribution = {}
 		for x in range(min(self.distribution), max(self.distribution) + 1):

@@ -11,13 +11,15 @@ def comprehensiveIterateModel(N,d,drop,dropN):
 	if isinstance(N, int):
 		new = Distribution()
 		new.populateIndividualChoice(N)
-		N = new
-	print(N.distribution)
+		N = new.normalize()
+	# print(N.distribution)
 	distribution = Distribution()
 	for x in N.distribution:
 		rolled = [1 for x in range(x)]
-		for n in range(d**x):
-			distribution.populateIndividualChoice(sum(dropdice(rolled, drop, dropN)), count=N.distribution[x])
+		numberofchoices=d**x
+		each=N.distribution[x]/numberofchoices
+		for n in range(numberofchoices):
+			distribution.populateIndividualChoice(sum(dropdice(rolled, drop, dropN)), count=each)
 			rolled[0] += 1
 			for index in range(x):
 				if rolled[index] > d:
