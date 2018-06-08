@@ -6,11 +6,11 @@ class Distribution:
 			distribution = {}
 		self.distribution = distribution
 
-	def populateIndividualChoice(self, choicevalue):
+	def populateIndividualChoice(self, choicevalue, count=1):
 		if choicevalue not in self.distribution:
-			self.distribution[choicevalue] = 1
+			self.distribution[choicevalue] = count
 		else:
-			self.distribution[choicevalue] += 1
+			self.distribution[choicevalue] += count
 
 	def filledDistribution(self):
 		filleddistribution = {}

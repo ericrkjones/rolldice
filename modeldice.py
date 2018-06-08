@@ -8,16 +8,23 @@ import matplotlib.pyplot as plt
 
 # Iterate every potential rolled set, drop dice, and populate a distribution.
 def comprehensiveIterateModel(N,d,drop,dropN):
+	if isinstance(N, int):
+		new = Distribution()
+		new.populateIndividualChoice(N)
+		N = new
+	print(N.distribution)
 	distribution = Distribution()
-	rolled = [1 for x in range(N)]
-	for n in range(d**N):
-		distribution.populateIndividualChoice(sum(dropdice(rolled, drop, dropN)))
-		rolled[0] += 1
-		for index in range(N):
-			if rolled[index] > d:
-				rolled[index] = 1
-				if index + 1 < N:
-					rolled[index+1] +=1
+	for x in N.distribution:
+		rolled = [1 for x in range(x)]
+		for n in range(d**x):
+			distribution.populateIndividualChoice(sum(dropdice(rolled, drop, dropN)), count=N.distribution[x])
+			rolled[0] += 1
+			for index in range(x):
+				if rolled[index] > d:
+					rolled[index] = 1
+					if index + 1 < x:
+						rolled[index+1] +=1
+	print(distribution.distribution)
 	return distribution					
 
 # Random number generated roll.  
