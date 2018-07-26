@@ -27,13 +27,14 @@ def comprehensiveIterateModel(N,d,drop,dropN):
 			numberofchoices=y**x
 			for n in range(numberofchoices):
 				set_distribution.populateIndividualChoice(sum(dropdice(rolled, drop, dropN)))
+				# print(rolled) #DEBUG
 				rolled[0] += 1
 				for index in range(x):
 					if rolled[index] > y:
 						rolled[index] = 1
 						if index + 1 < x:
 							rolled[index+1] +=1
-			set_distribution.inormalize(scale = N.distribution[x] * d.distribution[y])
+			# set_distribution.inormalize(scale = N.distribution[x] * d.distribution[y])
 			for y in set_distribution.distribution:
 				distribution.populateIndividualChoice(y, count=set_distribution.distribution[y])
 	print(distribution.distribution)
@@ -50,13 +51,13 @@ def parseinstructions(strargs):
 	print(instructions)
 	for item in instructions:
 		interpreted = interpretinstructions(item[0])
-		print(interpreted)
+		# print(interpreted)
 		rolled = eval(interpreted)
+		rolled.inormalize()
 		formatted = rolled.plotformat()
 		plt.plot(formatted[0], formatted[1])
-		plt.title(item[1])
+		if len(item) > 1:
+			plt.title(item[1:])
 		plt.show()
 
 parseinstructions(' '.join(sys.argv[1:]))
-
-
